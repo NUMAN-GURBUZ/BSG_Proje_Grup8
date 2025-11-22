@@ -1,0 +1,17 @@
+=== Phantom Fleet V2G Simülasyon Özeti ===
+Tarih: 2025-11-21 17:06:33.728735
+Arac Sayisi: 10
+Anomali Esigi: 5
+
+ARAÇ-001 | Son Şarj: 65.4% | Son Durum: idle
+ARAÇ-002 | Son Şarj: 64.2% | Son Durum: idle
+ARAÇ-003 | Son Şarj: 64.5% | Son Durum: idle
+ARAÇ-004 | Son Şarj: 66.3% | Son Durum: idle
+ARAÇ-005 | Son Şarj: 67.7% | Son Durum: idle
+ARAÇ-006 | Son Şarj: 51.4% | Son Durum: idle
+ARAÇ-007 | Son Şarj: 64.5% | Son Durum: idle
+ARAÇ-008 | Son Şarj: 64.0% | Son Durum: idle
+ARAÇ-009 | Son Şarj: 60.6% | Son Durum: idle
+ARAÇ-010 | Son Şarj: 63.6% | Son Durum: idle
+
+(Tüm detayli kayitlar 'phantom_fleet_logs.txt' dosyasina yazilmistir.)
