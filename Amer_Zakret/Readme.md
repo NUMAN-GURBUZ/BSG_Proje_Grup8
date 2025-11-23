@@ -21,3 +21,22 @@ Simülasyonu başlatmak için terminalde aşağıdaki komutu çalıştırın:
 
 ```bash
 python anomali_demo.py
+```
+## Beklenen Çıktı
+Program çalıştığında sırasıyla iki senaryoyu gerçekleştirecektir:
+
+Normal Çalışma (İlk 10 Saniye):
+
+İstasyon şarj işlemi yapar.
+
+RAM kullanımı sabit kalır veya çok az değişir.
+
+Durum: Sistem Stabil.
+
+Anomali Simülasyonu (Sonraki 20 Saniye):
+
+Yazılım hatası devreye girer.
+
+Her işlemde RAM kullanımı belirgin şekilde artar.
+
+ALARM: Artış oranı belirlenen eşiği (%20) aştığında sistem [ALARM] BELLEK SIZINTISI TESPİT EDİLDİ! uyarısı verir.
