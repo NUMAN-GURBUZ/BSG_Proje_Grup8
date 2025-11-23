@@ -1,0 +1,43 @@
+[
+  {
+    "ts": "2025-11-11T20:10:00Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 1500 }
+  },
+  {
+    "ts": "2025-11-11T20:10:02Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 1680 }
+  },
+  {
+    "ts": "2025-11-11T20:10:04Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 1890 }
+  },
+
+  {
+    "ts": "2025-11-11T20:10:06Z",
+    "action": "Disconnect"
+  },
+
+  {
+    "ts": "2025-11-11T20:10:08Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 2100 }
+  },
+  {
+    "ts": "2025-11-11T20:10:10Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 2300 }
+  },
+  {
+    "ts": "2025-11-11T20:10:12Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 2480 }
+  },
+  {
+    "ts": "2025-11-11T20:10:14Z",
+    "action": "MeterValues",
+    "payload": { "meterValue": 2600 }
+  }
+]
