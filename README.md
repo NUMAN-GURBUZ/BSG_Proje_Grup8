@@ -25,7 +25,7 @@ Bu proje kapsamında aşağıdaki 9 kritik anomali türü simüle edilmiş ve an
 | **7. Session Fork (Oturum Çatallama)** | Aynı istasyon kimliği (ID) ile ikinci bir WebSocket bağlantısı açılarak sunucunun yanıltılması ve sahte komutların işlenmesi. |
 | **8. Stop Transaction Bastırılması (Zombi Oturum)** | Şarj bitmesine rağmen `StopTransaction` mesajının ağda düşürülmesi (MitM) ve oturumun açık kalarak enerji/veri tutarsızlığı yaratması. |
 | **9. Token/Nonce Replay** | Önceden yakalanmış yetkilendirme tokenlarının tekrar kullanılarak yetkisiz şarj oturumu başlatılması. |
-| **10. OCPP Bağlantısı Kesilmesi** | Kural Tabanlı + Makine Öğrenimi (ML) Destekli Hibrit Anomali Tespiti. |
+| **10. OCPP Bağlantısı Kesilmesi** |  OCPP bağlantısının kopmasına rağmen güç aktarımının sürmesi; (Kural Tabanlı + Makine Öğrenimi (ML) Destekli Hibrit Anomali Tespiti). |
 
 ## ⚠️ Tespit Edilen Ortak Güvenlik Zafiyetleri
 
